@@ -1,0 +1,104 @@
+#!/usr/bin/python
+
+#######################################################################
+# This file is part of phil.
+#
+# Copyright (C) 2011 Will Kahn-Greene
+#
+# phil is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# phil is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with phil.  If not, see <http://www.gnu.org/licenses/>.
+#######################################################################
+
+"""
+This is the command-line side of phil
+"""
+
+import argparse
+import sys
+import os
+import textwrap
+
+
+try:
+    import phil
+except ImportError:
+    print "The phil library is not on your sys.path.  Please install phil."
+    sys.exit(1)
+
+
+BYLINE = 'phil-cmd: %s (%s)' % (phil.__version__, phil.__releasedate__)
+USAGE = 'Usage: phil [program-options] COMMAND [command-options] ARGS'
+DESC = """
+Command line interface for phil.
+"""
+
+
+def err(*output):
+    output = ''.join(textwrap.wrap(' '.join(output)))
+    sys.stderr.write(output + '\n')
+
+
+def msg(*output):
+    output = ''.join(textwrap.wrap(' '.join(output)))
+    sys.stdout.write(output + '\n')
+
+
+def createfile_cmd(parsed):
+    # argument tells where to save the file
+    outfile = parsed.conffile
+
+    path = os.path.abspath(outfile)
+
+    conffile = phil.configuration.get_template()
+    if os.path.exists(path):
+        err('%s exists.  Remove it and try again or try again with '
+            'a different filename.' % outfile)
+        return 1
+
+    f = open(path, 'w')
+    f.write(conffile)
+    f.close()
+
+    msg('%s written.  Open it in your favorite editor and read it.' % outfile)
+
+    return 0
+
+
+def run_cmd(parsed):
+    print parsed
+    return 0
+
+
+def main(argv):
+    msg(BYLINE)
+    parser = argparse.ArgumentParser(
+        description='Runs phil')
+    subparsers = parser.add_subparsers(
+        title='Commands',
+        help='Run "%(prog)s CMD --help" for additional help')
+
+    createfile_parser = subparsers.add_parser(
+        'createfile', help='Creates a configuration file')
+    createfile_parser.add_argument('conffile')
+    createfile_parser.set_defaults(func=createfile_cmd)
+
+    run_parser = subparsers.add_parser(
+        'run', help='Runs phil on the given configuration file')
+    run_parser.set_defaults(func=run_cmd)
+
+    parsed = parser.parse_args(argv)
+    return parsed.func(parsed)
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

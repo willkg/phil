@@ -50,6 +50,7 @@ setup(
     packages=find_packages(),
     scripts=['scripts/phil-cmd'],
     install_requires=[
+        "argparse",
         "icalendar",
         "python-dateutil",
         ]

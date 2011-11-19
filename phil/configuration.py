@@ -17,5 +17,14 @@
 # along with phil.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-__version__ = "0.1"
-__releasedate__ = 'dev'
+import os
+
+
+def get_template():
+    path = os.path.join(
+        os.path.dirname(__file__), 'templates', 'configuration.tmpl')
+    f = open(path, 'r')
+    data = f.read()
+    f.close()
+
+    return data

@@ -54,7 +54,7 @@ Configure
 phil requires a configuration file.  To generate a sample configuration file
 run phil this way::
 
-    phil-cmd createfile
+    phil-cmd createfile [configfile]
 
 Go through the file.  It is self-documenting.
 
@@ -64,12 +64,12 @@ Run
 
 For help, do this::
 
-    phil-cmd help
+    phil-cmd --help
 
 
 To run phil, do this::
 
-    phil-cmd run --config <configfile>
+    phil-cmd run <configfile>
 
 This runs phil with the given config file.
 
