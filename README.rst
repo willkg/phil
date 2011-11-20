@@ -56,9 +56,12 @@ the Terms and Conditions section of `LICENSE`_ for details.
 Install
 =======
 
-To install phil, do::
+phil hasn't been released, yet.  Once it's released, you can install it with
+pip.  Until then, you can:
 
-    pip install phil
+1. ``git clone git://github.com/willkg/phil.git``
+2. ``cd phil``
+3. ``python setup.py install``
 
 
 Configure
