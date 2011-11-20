@@ -41,6 +41,18 @@ forward with names like phil.
 Thus phil was born.
 
 
+License, etc
+============
+
+phil Copyright(C) 2011 Will Kahn-GReene
+
+This program comes with ABSOLUTELY NO WARRANTY.  This is free software,
+and you are welcome to redistribute it under certain conditions.  See
+the Terms and Conditions section of `LICENSE`_ for details.
+
+.. _LICENSE: http://www.gnu.org/licenses/gpl-3.0.html
+
+
 Install
 =======
 
@@ -79,6 +91,22 @@ To email reminders for meetings, do this::
     phil-cmd run <configfile>
 
 This runs phil with the given config file.
+
+
+Source code
+===========
+
+Source code is hosted on github.
+
+https://github.com/willkg/phil
+
+
+Issue tracker
+=============
+
+Issue tracker is hosted on github.
+
+https://github.com/willkg/phil/issues
 
 
 Resources I found helpful
