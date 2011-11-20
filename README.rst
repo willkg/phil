@@ -15,8 +15,9 @@ It solves this use case:
     with the details of when the meeting is, how to attend, and where
     the notes for the meeting will be.
 
-    Will sets up phil and runs it in a cron job that kicks off every morning,
-    checks the iCalendar files, and sends out meeting reminders accordingly.
+    Will installs and configures phil to send emails to the project list 
+    before the saturday meetings.  Will sets up a cron job to kick phil off
+    every morning to check for reminders it needs to send and send them.
 
 .. _iCalendar: http://tools.ietf.org/html/rfc5545
 
@@ -54,9 +55,15 @@ Configure
 phil requires a configuration file.  To generate a sample configuration file
 run phil this way::
 
-    phil-cmd createfile [configfile]
+    phil-cmd createfile <configfile>
 
-Go through the file.  It is self-documenting.
+The config file is self-documenting.  Go through it to configure phil.
+
+.. Note::
+
+   If you want to keep a pristine example config file with the documentation,
+   run ``phil-cmd createfile <configfile>`` and copy the resulting file to
+   another name.
 
 
 Run
@@ -67,18 +74,16 @@ For help, do this::
     phil-cmd --help
 
 
-To run phil, do this::
+To email reminders for meetings, do this::
 
     phil-cmd run <configfile>
 
 This runs phil with the given config file.
 
 
-Resources
-=========
+Resources I found helpful
+=========================
 
-http://tools.ietf.org/html/rfc5545#section-3.8.5.3
-
-http://labix.org/python-dateutil
-
-http://pypi.python.org/pypi/icalendar/3.0
+* http://tools.ietf.org/html/rfc5545#section-3.8.5.3
+* http://labix.org/python-dateutil
+* http://pypi.python.org/pypi/icalendar/3.0
