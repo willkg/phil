@@ -96,6 +96,24 @@ To email reminders for meetings, do this::
 This runs phil with the given config file.
 
 
+Test
+====
+
+phil comes with unit tests.  Unit tests are executed using `nose`_ and
+use `fudge`_ as a mocking framework.  If you don't already have nose
+and fudge installed, then install them with::
+
+    pip install nose fudge
+
+To run the unit tests from a git clone or the source tarball, do this
+from the project directory::
+
+    nosetests
+
+.. _nose: http://code.google.com/p/python-nose/
+.. _fudge: http://farmdev.com/projects/fudge/
+
+
 Source code
 ===========
 

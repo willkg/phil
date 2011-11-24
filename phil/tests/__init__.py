@@ -1,4 +1,4 @@
-#######################################################################
+######################################################################
 # This file is part of phil.
 #
 # Copyright (C) 2011 Will Kahn-Greene
@@ -17,7 +17,30 @@
 # along with phil.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-from configuration import get_template
-from check import check_for_events
-from _version import __version__, __releasedate__
-from util import err, out, wrap_paragraphs
+import os
+import tempfile
+import unittest
+import shutil
+import ConfigParser
+
+
+class TempFileTestCase(unittest.TestCase):
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        self.tempdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        unittest.TestCase.tearDown(self)
+        shutil.rmtree(self.tempdir)
+
+
+def build_config(section, icsfile, datadir, remind):
+    cfg = ConfigParser.SafeConfigParser()
+    cfg.add_section(section)
+    cfg.set(section, 'icsfile', icsfile)
+    cfg.set(section, 'datadir', datadir)
+    cfg.set(section, 'remind', remind)
+
+
+def get_test_data_dir():
+    return os.path.join(os.path.dirname(__file__), 'testdata')

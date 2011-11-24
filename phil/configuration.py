@@ -18,13 +18,24 @@
 #######################################################################
 
 import os
+import ConfigParser
+
+
+def ParseException(Exception):
+    pass
 
 
 def get_template():
     path = os.path.join(
-        os.path.dirname(__file__), 'templates', 'configuration.tmpl')
+        os.path.dirname(__file__), 'templates', 'config.ini')
     f = open(path, 'r')
     data = f.read()
     f.close()
 
     return data
+
+
+def parse_configuration(conffile):
+    scp = ConfigParser.SafeConfigParser()
+    scp.readfp(open(conffile))
+    return scp
