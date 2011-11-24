@@ -18,19 +18,20 @@
 #######################################################################
 
 
-import os
 import datetime
 import dateutil.rrule
-import json
 
 from phil.configuration import parse_configuration
-from phil.util import err, normalize_path, DIR
+from phil.util import err, normalize_path, DIR, load_state, save_state
 from icalendar import Calendar, vDatetime, vText
 
 
+# TODO: If we don't do anything with events, turn it into a 
+# namedtuple.
 class Event(object):
-    def __init__(self, rrule, summary='', description='', organizer='',
-                 url=''):
+    def __init__(self, event_id, rrule, summary='', description='',
+                 organizer='', url=''):
+        self.event_id = event_id
         self.rrule = rrule
         self.summary = summary
         self.description = description
@@ -48,6 +49,7 @@ FREQ_MAP = {
     'MONTHLY': dateutil.rrule.MONTHLY,
     'YEARLY': dateutil.rrule.YEARLY
     }
+
 
 def convert_rrule(rrule):
     args = {}
@@ -69,40 +71,28 @@ def parse_ics(icsfile):
 
     cal = Calendar.from_string(open(icsfile, 'rb').read())
     for component in cal.walk('vevent'):
-        dtstart = component['dtstart']
+        dtstart = vDatetime.from_ical(str(component['dtstart']))
         rrule = component['rrule']
 
         freq, args = convert_rrule(rrule)
-        args['dtstart'] = vDatetime.from_ical(str(dtstart))
+        args['dtstart'] = dtstart
 
         rrule = dateutil.rrule.rrule(freq, **args)
 
         keys = ['summary', 'description', 'organizer', 'url']
+
         args = dict((key, vText.from_ical(component.get(key, u'')))
                     for key in keys)
 
-        events.append(Event(rrule, **args))
+        # TODO: Find an event id.  If it's not there, then compose one
+        # with dtstart, summary, and organizer.
+        event_id = "::".join(
+            (str(dtstart),
+             args.get('summary', 'None'),
+             args.get('organizer', 'None')))
+
+        events.append(Event(event_id, rrule, **args))
     return events
-
-
-def get_state_js(datadir):
-    return os.path.join(datadir, 'state.js')
-
-
-def load_state(datadir):
-    path = get_state_js(datadir)
-    if not os.path.exists(path):
-        # save the state here so we can fail on permissions errors
-        # before sending email.
-        save_state(datadir, {})
-        return {}
-
-    return json.loads(open(path, 'rb').read())
-
-
-def save_state(datadir, data):
-    path = get_state_js(datadir)
-    open(path, 'wb').write(json.dumps(data))
 
 
 def handle_section(section, cfg):
@@ -112,7 +102,7 @@ def handle_section(section, cfg):
     datadir = normalize_path(cfg.get(section, 'datadir'), DIR)
     remind = int(cfg.get(section, 'remind'))
 
-    # TODO: catch exceptions with state loading here
+    # TODO: Catch exceptions with state loading here.
     state = load_state(datadir)
 
     today = datetime.date.today()
@@ -122,6 +112,8 @@ def handle_section(section, cfg):
         delta = event.rrule - today
         if remind <= delta.days:
             print "REMIND ME!"
+
+    save_state(datadir, state)
 
 
 def check_for_events(conf):

@@ -21,6 +21,7 @@
 import os
 import textwrap
 import sys
+import json
 
 
 FILE = 'file'
@@ -59,3 +60,21 @@ def out(*output):
     sys.stdout.write(output + '\n')
 
 
+def get_state_js(datadir):
+    return os.path.join(datadir, 'state.js')
+
+
+def load_state(datadir):
+    path = get_state_js(datadir)
+    if not os.path.exists(path):
+        # save the state here so we can fail on permissions errors
+        # before sending email.
+        save_state(datadir, {})
+        return {}
+
+    return json.loads(open(path, 'rb').read())
+
+
+def save_state(datadir, data):
+    path = get_state_js(datadir)
+    open(path, 'wb').write(json.dumps(data))

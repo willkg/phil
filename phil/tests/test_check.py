@@ -32,9 +32,11 @@ def test_parse_ics():
     eq_(len(events), 1)
 
     ev = events[0]
+    eq_(ev.event_id, u'2011-11-18 12:00:00::bi-weekly conference call::')
     eq_(ev.summary, u'bi-weekly conference call')
     eq_(ev.description, u'conference call')
     eq_(ev.organizer, u'')
     eq_(ev.url, u'')
     
-    # TODO: test with other ics files
+    # TODO: Test with other ics files
+    # TODO: Test multiple events
