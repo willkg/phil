@@ -105,11 +105,22 @@ and fudge installed, then install them with::
 
     pip install nose fudge
 
+I like to use `nose-progressive`_, too, because it's awesome.  To
+install that::
+
+    pip install nose-progressive
+
 To run the unit tests from a git clone or the source tarball, do this
 from the project directory::
 
     nosetests
 
+With nose-progressive and fail-fast::
+
+    nosetests -x --with-progressive
+
+
+.. _nose-progressive: http://pypi.python.org/pypi/nose-progressive/
 .. _nose: http://code.google.com/p/python-nose/
 .. _fudge: http://farmdev.com/projects/fudge/
 

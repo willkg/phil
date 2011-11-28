@@ -53,9 +53,5 @@ setup(
         "argparse",
         "icalendar",
         "python-dateutil==1.5",  # 2.0 and higher are for python3
-        ],
-    test_require=[
-        "nose",
-        "fudge"
         ]
     )
