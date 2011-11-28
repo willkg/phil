@@ -52,6 +52,7 @@ FREQ_MAP = {
 
 
 def convert_rrule(rrule):
+    """Converts icalendar rrule to dateutil rrule."""
     args = {}
 
     # TODO: rrule['freq'] is a list, but I'm unclear as to why.
@@ -95,6 +96,15 @@ def parse_ics(icsfile):
     return events
 
 
+def should_remind(remind, rrule, dtstart=None):
+    if dtstart == None:
+        dtstart = datetime.datetime.today()
+
+    nextdate = rrule.after(dtstart, inc=True)
+    delta = nextdate - dtstart
+    return remind == delta.days
+
+
 def handle_section(section, cfg):
     # TODO: These override default section defaults.
     # TODO: Handle absence of variables.
@@ -108,9 +118,7 @@ def handle_section(section, cfg):
     today = datetime.date.today()
     events = parse_ics(icsfile)
     for event in events:
-        # TODO: Rewrite this to use rrule and .after(date, inc=True)
-        delta = event.rrule - today
-        if remind <= delta.days:
+        if should_remind(remind, today, event.rrule):
             print "REMIND ME!"
 
     save_state(datadir, state)
