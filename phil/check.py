@@ -61,8 +61,12 @@ def convert_rrule(rrule):
     keys = ['wkst', 'until', 'bysetpos', 'interval',
             'bymonth', 'bymonthday', 'byyearday', 'byweekno',
             'byweekday', 'byhour', 'byminute', 'bysecond']
-    args = dict((key, rrule.get(key)) for key in keys)
-
+    def tweak(rrule, key):
+        value = rrule.get(key)
+        if isinstance(value, list):
+            return value[0]
+        return value
+    args = dict((key, tweak(rrule, key)) for key in keys)
     return freq, args
 
 
@@ -101,7 +105,7 @@ def should_remind(remind, rrule, dtstart=None):
         dtstart = datetime.datetime.today()
 
     nextdate = rrule.after(dtstart, inc=True)
-    delta = nextdate - dtstart
+    delta = nextdate.date() - dtstart.date()
     return remind == delta.days
 
 
@@ -115,10 +119,9 @@ def handle_section(section, cfg):
     # TODO: Catch exceptions with state loading here.
     state = load_state(datadir)
 
-    today = datetime.date.today()
     events = parse_ics(icsfile)
     for event in events:
-        if should_remind(remind, today, event.rrule):
+        if should_remind(remind, event.rrule):
             print "REMIND ME!"
 
     save_state(datadir, state)

@@ -49,37 +49,38 @@ def test_should_remind():
         freq = FREQ_MAP[freq]
         return dateutil.rrule.rrule(freq, **args)
 
+    # look at yesterday at 12:00
     today = datetime.datetime.today()
     td = datetime.timedelta
 
-    # 6 days from now
+    # 0 days from now
     rule = build_rrule('DAILY', dtstart=today, interval=7)
     eq_(should_remind(1, rule, today), False)
 
-    # 0 days from now
+    # 1 days from now
     rule = build_rrule('DAILY', dtstart=today + td(1), interval=7)
-    eq_(should_remind(1, rule, today), False)
-
-    # 1 day from now
-    rule = build_rrule('DAILY', dtstart=today + td(2), interval=7)
     eq_(should_remind(1, rule, today), True)
 
-    # 2 days from now
-    rule = build_rrule('DAILY', dtstart=today + td(3), interval=7)
+    # 2 day from now
+    rule = build_rrule('DAILY', dtstart=today + td(2), interval=7)
     eq_(should_remind(1, rule, today), False)
 
     # 3 days from now
-    rule = build_rrule('DAILY', dtstart=today + td(4), interval=7)
+    rule = build_rrule('DAILY', dtstart=today + td(3), interval=7)
     eq_(should_remind(1, rule, today), False)
 
     # 4 days from now
-    rule = build_rrule('DAILY', dtstart=today + td(5), interval=7)
+    rule = build_rrule('DAILY', dtstart=today + td(4), interval=7)
     eq_(should_remind(1, rule, today), False)
 
     # 5 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(5), interval=7)
+    eq_(should_remind(1, rule, today), False)
+
+    # 6 days from now
     rule = build_rrule('DAILY', dtstart=today + td(6), interval=7)
     eq_(should_remind(1, rule, today), False)
 
     # 3 days from now, remind in 3
-    rule = build_rrule('DAILY', dtstart=today + td(4), interval=7)
+    rule = build_rrule('DAILY', dtstart=today + td(3), interval=7)
     eq_(should_remind(3, rule, today), True)
