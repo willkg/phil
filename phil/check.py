@@ -169,7 +169,8 @@ def handle_cfg(cfg, quiet, debug):
             state[event.event_id] = str(next_date.date())
         else:
             if not quiet:
-                out('Next reminder should get sent on %s.' % next_date)
+                out('Next reminder should get sent on %s.' %
+                    (next_date.date() - datetime.timedelta(section.remind)))
 
     save_state(section.datadir, state)
 
@@ -201,5 +202,5 @@ def check_for_events(conf, quiet, debug):
         return 1
 
     if not quiet:
-        out('finished!')
+        out('Finished!')
     return 0
