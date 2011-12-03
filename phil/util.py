@@ -51,7 +51,8 @@ def wrap_paragraphs(text):
 
 
 def err(*output):
-    output = '\n'.join(textwrap.wrap(' '.join(output)))
+    output = 'Error: ' + ' '.join(output)
+    output = '\n'.join(textwrap.wrap(output))
     sys.stderr.write(output + '\n')
 
 
