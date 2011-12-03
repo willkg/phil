@@ -108,7 +108,10 @@ def parse_cfg(cfg):
     remind = int(cfg.get('default', 'remind'))
     datadir = normalize_path(cfg.get('default', 'datadir'), DIR)
     host = cfg.get('default', 'smtp_host')
-    port = int(cfg.get('default', 'smtp_port', 25))
+    if cfg.has_option('default', 'smtp_port'):
+        port = int(cfg.get('default', 'smtp_port'))
+    else:
+        port = 25
     sender = cfg.get('default', 'from')
     to_list = cfg.get('default', 'to').splitlines()
 
@@ -116,6 +119,8 @@ def parse_cfg(cfg):
 
 
 def handle_cfg(cfg, quiet, debug):
+    if not quiet:
+        out('Parsing config file....')
     try:
         section = parse_cfg(cfg)
     except ConfigParser.NoOptionError, noe:
@@ -125,17 +130,29 @@ def handle_cfg(cfg, quiet, debug):
     dtstart = datetime.datetime.today()
 
     # TODO: Catch exceptions with state loading here.
+    if not quiet:
+        out('Loading state....')
+
     state = load_state(section.datadir)
+
+    if not quiet:
+        out('Parsing ics file "%s"....' % section.icsfile)
 
     events = parse_ics(section.icsfile)
     for event in events:
+        if not quiet:
+            out('Looking at event "%s"....' % event.summary)
+
         next_date = get_next_date(dtstart, event.rrule)
         previous_remind = state.get(event.event_id)
-        if previous_remind:
-            if previous_remind == str(next_date.date()):
-                continue
+        if previous_remind and previous_remind == str(next_date.date()):
+            if not quiet:
+                out('Already sent a reminder for this meeting.')
+            continue
 
         if should_remind(dtstart, next_date, section.remind):
+            if not quiet:
+                out('Sending reminder....')
             summary = event.summary
             description = event.description
 
@@ -149,26 +166,12 @@ def handle_cfg(cfg, quiet, debug):
                 send_mail_smtp(section.sender, section.to_list, summary,
                                description, section.host, section.port)
 
-        state[event.event_id] = str(next_date.date())
+            state[event.event_id] = str(next_date.date())
+        else:
+            if not quiet:
+                out('Next reminder should get sent on %s.' % next_date)
 
     save_state(section.datadir, state)
-
-
-def check_for_events(conf, quiet, debug):
-    cfg = parse_configuration(conf)
-
-    try:
-        handle_cfg(cfg, quiet, debug)
-
-    except Exception, e:
-        import traceback
-        err(''.join(traceback.format_exc()))
-        err('%s (%r)' % (e, e))
-        return 1
-
-    if not quiet:
-        out('finished!')
-    return 0
 
 
 def send_mail_smtp(from_name, from_addr, to_list, subject, body, host, port):
@@ -182,3 +185,21 @@ def send_mail_smtp(from_name, from_addr, to_list, subject, body, host, port):
         server.sendmail(from_addr, [to_addr], msg.as_string())
 
     server.quit()
+
+
+def check_for_events(conf, quiet, debug):
+    cfg = parse_configuration(conf)
+
+    try:
+        handle_cfg(cfg, quiet, debug)
+
+    except Exception:
+        import traceback
+        err(''.join(traceback.format_exc()), wrap=False)
+        err('phil has died unexpectedly.  If you think this is an error '
+            '(which it is), then contact phil\'s authors for help.')
+        return 1
+
+    if not quiet:
+        out('finished!')
+    return 0

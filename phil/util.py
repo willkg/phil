@@ -50,14 +50,29 @@ def wrap_paragraphs(text):
     return '\n\n'.join(text)
 
 
-def err(*output):
+def err(*output, **kwargs):
+    """Writes output to stderr.
+
+    :arg wrap: If you set ``wrap=False``, then ``err`` won't textwrap
+        the output.
+
+    """
     output = 'Error: ' + ' '.join(output)
-    output = '\n'.join(textwrap.wrap(output))
+    if kwargs.get('wrap') != False:
+        output = '\n'.join(textwrap.wrap(output))
     sys.stderr.write(output + '\n')
 
 
-def out(*output):
-    output = '\n'.join(textwrap.wrap(' '.join(output)))
+def out(*output, **kwargs):
+    """Writes output to stdout.
+
+    :arg wrap: If you set ``wrap=False``, then ``out`` won't textwrap
+        the output.
+
+    """
+    output = ' '.join(output)
+    if kwargs.get('wrap') != False:
+        output = '\n'.join(textwrap.wrap(output))
     sys.stdout.write(output + '\n')
 
 
