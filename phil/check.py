@@ -23,7 +23,7 @@ import ConfigParser
 
 from phil.util import (
     out, err, load_state, save_state, parse_configuration, parse_ics,
-    get_next_date, should_remind, send_mail_smtp)
+    get_next_date, should_remind, send_mail_smtp, format_date)
 
 
 class Phil(object):
@@ -59,21 +59,22 @@ class Phil(object):
             if should_remind(dtstart, next_date, self.config.remind):
                 if not self.quiet:
                     out('Sending reminder....')
-                summary = event.summary
-                description = event.description
+                summary = event.summary + ' (%s)' % format_date(next_date)
+                description = ('Next meeting: %s\n\n%s' %
+                               (format_date(next_date), event.description))
 
                 if self.debug:
                     out('From:', self.config.sender)
                     out('To:', self.config.to_list)
                     out('Subject:', summary)
                     out('Body:')
-                    out(description)
+                    out(description, indent='    ', wrap=False)
                 else:
                     send_mail_smtp(self.config.sender, self.config.to_list,
                                    summary, description, self.config.host,
                                    self.config.port)
 
-                state[event.event_id] = str(next_date.date())
+                    state[event.event_id] = str(next_date.date())
             else:
                 if not self.quiet:
                     out('Next reminder should get sent on %s.' %

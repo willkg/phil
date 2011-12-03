@@ -35,6 +35,10 @@ FILE = 'file'
 DIR = 'dir'
 
 
+def format_date(date):
+    return date.strftime('%a %B %d, %Y %H:%M')
+
+
 def normalize_path(path, filetype=FILE):
     """Takes a path and a filetype, verifies existence and type, and
     returns absolute path.
@@ -52,6 +56,12 @@ def normalize_path(path, filetype=FILE):
     return os.path.abspath(path)
 
 
+def wrap(text, indent=''):
+    return (
+        textwrap.TextWrapper(initial_indent=indent, subsequent_indent=indent)
+        .wrap(text))
+
+
 def wrap_paragraphs(text):
     text = ['\n'.join(textwrap.wrap(mem)) for mem in text.split('\n\n')]
     return '\n\n'.join(text)
@@ -64,9 +74,12 @@ def err(*output, **kwargs):
         the output.
 
     """
-    output = 'Error: ' + ' '.join(output)
+    output = 'Error: ' + ' '.join([str(o) for o in output])
     if kwargs.get('wrap') != False:
-        output = '\n'.join(textwrap.wrap(output))
+        output = '\n'.join(wrap(output, kwargs.get('indent', '')))
+    elif kwargs.get('indent'):
+        indent = kwargs['indent']
+        output = indent + ('\n' + indent).join(output.splitlines())
     sys.stderr.write(output + '\n')
 
 
@@ -77,9 +90,12 @@ def out(*output, **kwargs):
         the output.
 
     """
-    output = ' '.join(output)
+    output = ' '.join([str(o) for o in output])
     if kwargs.get('wrap') != False:
-        output = '\n'.join(textwrap.wrap(output))
+        output = '\n'.join(wrap(output, kwargs.get('indent', '')))
+    elif kwargs.get('indent'):
+        indent = kwargs['indent']
+        output = indent + ('\n' + indent).join(output.splitlines())
     sys.stdout.write(output + '\n')
 
 
@@ -157,7 +173,7 @@ def get_next_date(dtstart, rrule):
 
 def should_remind(dtstart, next_date, remind):
     delta = next_date.date() - dtstart.date()
-    return remind == delta.days
+    return remind >= delta.days
 
 
 def convert_rrule(rrule):
@@ -205,14 +221,17 @@ def parse_ics(icsfile):
     return events
 
 
-def send_mail_smtp(from_name, from_addr, to_list, subject, body, host, port):
+def send_mail_smtp(sender, to_list, subject, body, host, port):
     server = smtplib.SMTP(host, port)
+
+    sender_name, sender_addr = email.utils.parseaddr(sender)
+    to_list = [email.utils.parseaddr(addr) for addr in to_list]
 
     for to_name, to_addr in to_list:
         msg = MIMEText(body)
-        msg['To'] = email.utils.formataddr((from_name, from_addr))
-        msg['From'] = email.utils.formataddr((to_name, to_addr))
+        msg['To'] = email.utils.formataddr((to_name, to_addr))
+        msg['From'] = email.utils.formataddr((sender_name, sender_addr))
         msg['Subject'] = subject
-        server.sendmail(from_addr, [to_addr], msg.as_string())
+        server.sendmail(sender_addr, [to_addr], msg.as_string())
 
     server.quit()

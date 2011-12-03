@@ -74,10 +74,6 @@ def test_should_remind():
     today = datetime.datetime.today()
     td = datetime.timedelta
 
-    # 0 days from now
-    rule = build_rrule('DAILY', dtstart=today, interval=7)
-    eq_(should_remind(today, get_next_date(today, rule), 1), False)
-
     # 1 days from now
     rule = build_rrule('DAILY', dtstart=today + td(1), interval=7)
     eq_(should_remind(today, get_next_date(today, rule), 1), True)
