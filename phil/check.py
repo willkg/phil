@@ -115,7 +115,7 @@ def parse_cfg(cfg):
     return Section(icsfile, remind, datadir, host, port, sender, to_list)
 
 
-def handle_cfg(cfg):
+def handle_cfg(cfg, quiet, debug):
     try:
         section = parse_cfg(cfg)
     except ConfigParser.NoOptionError, noe:
@@ -139,8 +139,15 @@ def handle_cfg(cfg):
             summary = event.summary
             description = event.description
 
-            send_mail_smtp(section.sender, section.to_list, summary,
-                           description, section.host, section.port)
+            if debug:
+                out('From:', section.sender)
+                out('To:', section.to_list)
+                out('Subject:', summary)
+                out('Body:')
+                out(description)
+            else:
+                send_mail_smtp(section.sender, section.to_list, summary,
+                               description, section.host, section.port)
 
         state[event.event_id] = str(next_date.date())
 
@@ -151,7 +158,7 @@ def check_for_events(conf, quiet, debug):
     cfg = parse_configuration(conf)
 
     try:
-        handle_cfg(cfg)
+        handle_cfg(cfg, quiet, debug)
 
     except Exception, e:
         import traceback
