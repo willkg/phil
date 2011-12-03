@@ -22,6 +22,20 @@ It solves this use case:
 .. _iCalendar: http://tools.ietf.org/html/rfc5545
 
 
+Features
+========
+
+* has a configuration file in config.ini format
+* parses iCalendar files, calculates the next valid meeting date, and sends
+  reminder email x days before the meeting
+* tries not to remind you about the same meeting twice!
+* has a ``--debug`` mode allowing you to test things without actually sending
+  email
+* has a ``--quiet`` mode that will only print errors
+* correctly prints errors to stderr and output to stdout; also returns error
+  code 1 if it failed
+
+
 History
 =======
 
@@ -44,7 +58,7 @@ Thus phil was born.
 License, etc
 ============
 
-phil Copyright(C) 2011 Will Kahn-GReene
+phil Copyright(C) 2011 Will Kahn-Greene
 
 This program comes with ABSOLUTELY NO WARRANTY.  This is free software,
 and you are welcome to redistribute it under certain conditions.  See
@@ -77,8 +91,7 @@ The config file is self-documenting.  Go through it to configure phil.
 .. Note::
 
    If you want to keep a pristine example config file with the documentation,
-   run ``phil-cmd createfile <configfile>`` and copy the resulting file to
-   another name.
+   run ``phil-cmd createfile config_pristine.ini``.
 
 
 Run
@@ -94,6 +107,19 @@ To email reminders for meetings, do this::
     phil-cmd run <configfile>
 
 This runs phil with the given config file.
+
+phil has a quiet mode which only prints errors::
+
+    phil-cmd --quiet ...
+
+
+phil has a debug mode which does everything **except** actually send email::
+
+    phil-cmd --debug ...
+
+
+phil keeps track of the last meeting date/time that it reminded you about.
+If you run phil twice, it'll only remind you about a meeting once.
 
 
 Test
