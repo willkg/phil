@@ -18,28 +18,18 @@
 #######################################################################
 
 
+from collections import namedtuple
+
 import datetime
 import dateutil.rrule
 
 from phil.configuration import parse_configuration
-from phil.util import err, normalize_path, DIR, load_state, save_state
+from phil.util import out, err, normalize_path, DIR, load_state, save_state
 from icalendar import Calendar, vDatetime, vText
 
-
-# TODO: If we don't do anything with events, turn it into a 
-# namedtuple.
-class Event(object):
-    def __init__(self, event_id, rrule, summary='', description='',
-                 organizer='', url=''):
-        self.event_id = event_id
-        self.rrule = rrule
-        self.summary = summary
-        self.description = description
-        self.organizer = organizer
-        self.url = url
-
-    def __repr__(self):
-        return "<Event %r %s>" % (self.rrule, self.summary)
+import smtplib
+import email.utils
+from email.mime.text import MIMEText
 
 
 FREQ_MAP = {
@@ -70,6 +60,9 @@ def convert_rrule(rrule):
     return freq, args
 
 
+Event = namedtuple('Event', ['event_id', 'rrule', 'summary', 'description'])
+
+
 def parse_ics(icsfile):
     """Takes an icsfilename, parses it, and returns Events."""
     events = []
@@ -84,60 +77,102 @@ def parse_ics(icsfile):
 
         rrule = dateutil.rrule.rrule(freq, **args)
 
-        keys = ['summary', 'description', 'organizer', 'url']
-
-        args = dict((key, vText.from_ical(component.get(key, u'')))
-                    for key in keys)
+        summary = vText.from_ical(component.get('summary', u''))
+        description = vText.from_ical(component.get('description', u''))
+        organizer = vText.from_ical(component.get('organizer', u''))
 
         # TODO: Find an event id.  If it's not there, then compose one
         # with dtstart, summary, and organizer.
-        event_id = "::".join(
-            (str(dtstart),
-             args.get('summary', 'None'),
-             args.get('organizer', 'None')))
+        event_id = "::".join((str(dtstart), summary, organizer))
 
-        events.append(Event(event_id, rrule, **args))
+        events.append(Event(event_id, rrule, summary, description))
     return events
 
 
-def should_remind(remind, rrule, dtstart=None):
-    if dtstart == None:
-        dtstart = datetime.datetime.today()
+def get_next_date(dtstart, rrule):
+    return rrule.after(dtstart, inc=True)
 
-    nextdate = rrule.after(dtstart, inc=True)
-    delta = nextdate.date() - dtstart.date()
+
+def should_remind(dtstart, next_date, remind):
+    delta = next_date.date() - dtstart.date()
     return remind == delta.days
 
 
-def handle_section(section, cfg):
-    # TODO: These override default section defaults.
-    # TODO: Handle absence of variables.
-    icsfile = normalize_path(cfg.get(section, 'icsfile'))
-    datadir = normalize_path(cfg.get(section, 'datadir'), DIR)
-    remind = int(cfg.get(section, 'remind'))
+Section = namedtuple('Section', ['icsfile', 'remind', 'datadir', 'host',
+                                 'port', 'sender', 'to_list'])
+
+
+def parse_cfg(cfg):
+    def extract_or_fail(key, type_):
+        value = cfg.get('default', key)
+        if value is None:
+            raise ValueError('%s is not defined.')
+
+        return type_(value)
+
+    icsfile = normalize_path(extract_or_fail('icsfile', str))
+    remind = extract_or_fail('remind', int)
+    datadir = normalize_path(extract_or_fail('datadir', str), DIR)
+    host = extract_or_fail('smtp_host', str)
+    port = int(cfg.get('default', 'smtp_port', 25))
+    sender = extract_or_fail('from', str)
+    to_list = extract_or_fail('to', str).splitlines()
+
+    return Section(icsfile, remind, datadir, host, port, sender, to_list)
+
+
+def handle_cfg(cfg):
+    section = parse_cfg(cfg)
+    dtstart = datetime.datetime.today()
 
     # TODO: Catch exceptions with state loading here.
-    state = load_state(datadir)
+    state = load_state(section.datadir)
 
-    events = parse_ics(icsfile)
+    events = parse_ics(section.icsfile)
     for event in events:
-        if should_remind(remind, event.rrule):
-            print "REMIND ME!"
+        next_date = get_next_date(dtstart, event.rrule)
+        previous_remind = state.get(event.event_id)
+        if previous_remind:
+            if previous_remind == str(next_date.date()):
+                continue
 
-    save_state(datadir, state)
+        if should_remind(dtstart, next_date, section.remind):
+            summary = event.summary
+            description = event.description
+
+            send_mail_smtp(section.sender, section.to_list, summary,
+                           description, section.host, section.port)
+
+        state[event.event_id] = str(next_date.date())
+
+    save_state(section.datadir, state)
 
 
-def check_for_events(conf):
+def check_for_events(conf, quiet, debug):
     cfg = parse_configuration(conf)
 
     try:
-        for section in cfg.sections():
-            handle_section(section, cfg)
+        handle_cfg(cfg)
+
     except Exception, e:
         import traceback
-        print "".join(traceback.format_exc())
+        err(''.join(traceback.format_exc()))
         err('%s (%r)' % (e, e))
         return 1
 
-    print "done!"
+    if not quiet:
+        out('done!')
     return 0
+
+
+def send_mail_smtp(from_name, from_addr, to_list, subject, body, host, port):
+    server = smtplib.SMTP(host, port)
+
+    for to_name, to_addr in to_list:
+        msg = MIMEText(body)
+        msg['To'] = email.utils.formataddr((from_name, from_addr))
+        msg['From'] = email.utils.formataddr((to_name, to_addr))
+        msg['Subject'] = subject
+        server.sendmail(from_addr, [to_addr], msg.as_string())
+
+    server.quit()

@@ -17,7 +17,8 @@
 # along with phil.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-from configuration import get_template
-from check import check_for_events
-from _version import __version__, __releasedate__
-from util import err, out, wrap_paragraphs
+from phil.configuration import get_template
+from phil.check import check_for_events
+from phil._version import __version__, __releasedate__
+from phil.util import err, out, wrap_paragraphs
+from phil.cmdline import main
