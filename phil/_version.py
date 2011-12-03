@@ -17,5 +17,5 @@
 # along with phil.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-__version__ = "0.1"
-__releasedate__ = 'dev'
+__version__ = '1.0'
+__releasedate__ = '2011-12-03'
