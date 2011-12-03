@@ -20,11 +20,16 @@
 
 import os
 from nose.tools import eq_, assert_raises
+import datetime
+import dateutil.rrule
+
+from phil.tests import get_test_data_dir
+from phil.util import (
+    normalize_path, FILE, DIR, parse_ics, should_remind, get_next_date,
+    FREQ_MAP)
 
 
 def test_normalize_path():
-    from phil.util import normalize_path, FILE, DIR
-
     tests = (
         (__file__, FILE, __file__),
         (os.path.dirname(__file__), DIR, os.path.dirname(__file__))
@@ -43,3 +48,60 @@ def test_normalize_path():
 
     for text, filetype in failed_tests:
         assert_raises(ValueError, normalize_path, text, filetype)
+
+
+def test_parse_ics():
+    test1 = os.path.join(get_test_data_dir(), 'test1.ics')
+    events = parse_ics(test1)
+
+    eq_(len(events), 1)
+
+    ev = events[0]
+    eq_(ev.event_id, u'2011-11-18 12:00:00::bi-weekly conference call::')
+    eq_(ev.summary, u'bi-weekly conference call')
+    eq_(ev.description, u'conference call')
+    
+    # TODO: Test with other ics files
+    # TODO: Test multiple events
+
+
+def test_should_remind():
+    def build_rrule(freq, **args):
+        freq = FREQ_MAP[freq]
+        return dateutil.rrule.rrule(freq, **args)
+
+    # look at yesterday at 12:00
+    today = datetime.datetime.today()
+    td = datetime.timedelta
+
+    # 0 days from now
+    rule = build_rrule('DAILY', dtstart=today, interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 1 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(1), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), True)
+
+    # 2 day from now
+    rule = build_rrule('DAILY', dtstart=today + td(2), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 3 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(3), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 4 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(4), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 5 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(5), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 6 days from now
+    rule = build_rrule('DAILY', dtstart=today + td(6), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 1), False)
+
+    # 3 days from now, remind in 3
+    rule = build_rrule('DAILY', dtstart=today + td(3), interval=7)
+    eq_(should_remind(today, get_next_date(today, rule), 3), True)

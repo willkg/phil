@@ -62,8 +62,8 @@ def run_cmd(parsed):
         phil.err('%s does not exist.' % conffile)
         return 1
 
-    phil.check_for_events(conffile, parsed.quiet, parsed.debug)
-    return 0
+    p = phil.Phil(parsed.quiet, parsed.debug)
+    return p.run(conffile)
 
 
 def main(argv):
