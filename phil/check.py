@@ -22,6 +22,7 @@ from collections import namedtuple
 
 import datetime
 import dateutil.rrule
+import ConfigParser
 
 from phil.configuration import parse_configuration
 from phil.util import out, err, normalize_path, DIR, load_state, save_state
@@ -103,26 +104,24 @@ Section = namedtuple('Section', ['icsfile', 'remind', 'datadir', 'host',
 
 
 def parse_cfg(cfg):
-    def extract_or_fail(key, type_):
-        value = cfg.get('default', key)
-        if value is None:
-            raise ValueError('%s is not defined.')
-
-        return type_(value)
-
-    icsfile = normalize_path(extract_or_fail('icsfile', str))
-    remind = extract_or_fail('remind', int)
-    datadir = normalize_path(extract_or_fail('datadir', str), DIR)
-    host = extract_or_fail('smtp_host', str)
+    icsfile = normalize_path(cfg.get('default', 'icsfile'))
+    remind = int(cfg.get('default', 'remind'))
+    datadir = normalize_path(cfg.get('default', 'datadir'), DIR)
+    host = cfg.get('default', 'smtp_host')
     port = int(cfg.get('default', 'smtp_port', 25))
-    sender = extract_or_fail('from', str)
-    to_list = extract_or_fail('to', str).splitlines()
+    sender = cfg.get('default', 'from')
+    to_list = cfg.get('default', 'to').splitlines()
 
     return Section(icsfile, remind, datadir, host, port, sender, to_list)
 
 
 def handle_cfg(cfg):
-    section = parse_cfg(cfg)
+    try:
+        section = parse_cfg(cfg)
+    except ConfigParser.NoOptionError, noe:
+        err('Missing option in config file: %s' % noe)
+        return
+
     dtstart = datetime.datetime.today()
 
     # TODO: Catch exceptions with state loading here.
@@ -161,7 +160,7 @@ def check_for_events(conf, quiet, debug):
         return 1
 
     if not quiet:
-        out('done!')
+        out('finished!')
     return 0
 
 
