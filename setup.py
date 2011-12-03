@@ -46,6 +46,7 @@ setup(
     author="Will Kahn-Greene",
     author_email="willg@bluesock.org",
     keywords="phil icalendar rrule email",
+    url="http://github.com/willkg/phil",
     zip_safe=True,
     packages=find_packages(),
     scripts=['scripts/phil-cmd'],
@@ -53,5 +54,13 @@ setup(
         "argparse",
         "icalendar",
         "python-dateutil==1.5",  # 2.0 and higher are for python3
-        ]
+        ],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Environment :: Console",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Operating System :: POSIX :: Linux",
+        "Topic :: Communications :: Email",
+        "Programming Language :: Python",
+        ],
     )
