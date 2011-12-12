@@ -1,0 +1,15 @@
+===========
+ CHANGELOG
+===========
+
+phil 1.0.1 (December 12, 2011)
+==============================
+
+* minor documentation fixes
+* added MANIFEST.in fixing ``pip install phil`` problems
+
+
+phil 1.0 (December 3, 2011)
+===========================
+
+* initial release
