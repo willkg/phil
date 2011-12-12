@@ -70,8 +70,12 @@ the Terms and Conditions section of `LICENSE`_ for details.
 Install
 =======
 
-phil hasn't been released, yet.  Once it's released, you can install it with
-pip.  Until then, you can:
+If you want a released version of phil, do this::
+
+1. ``pip install phil``
+
+
+If you want a bleeding edge version of phil, do this::
 
 1. ``git clone git://github.com/willkg/phil.git``
 2. ``cd phil``
