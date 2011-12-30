@@ -65,6 +65,18 @@ def test_parse_ics():
     # TODO: Test multiple events
 
 
+def test_ics_description_expansion():
+    test2 = os.path.join(get_test_data_dir(), 'test2.ics')
+    events = parse_ics(test2)
+
+    eq_(len(events), 1)
+
+    ev = events[0]
+    eq_(ev.description,
+        u'Weekly conference call\nLocation: IRC\nMeeting agenda and notes: '
+        'http://example.com/notes/%(Y)s-%(m)s-%(d)s\n\nBe there or be '
+        'square!')
+
 def test_should_remind():
     def build_rrule(freq, **args):
         freq = FREQ_MAP[freq]

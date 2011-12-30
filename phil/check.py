@@ -22,8 +22,9 @@ import datetime
 import ConfigParser
 
 from phil.util import (
-    out, err, load_state, save_state, parse_configuration, parse_ics,
-    get_next_date, should_remind, send_mail_smtp, format_date)
+    out, err, parse_configuration, parse_ics, get_next_date, should_remind,
+    format_date, generate_date_bits)
+import phil.util
 
 
 class Phil(object):
@@ -32,14 +33,13 @@ class Phil(object):
         self.quiet = quiet
         self.debug = debug
 
-
     def _run(self):
         dtstart = datetime.datetime.today()
 
         if not self.quiet:
             out('Loading state....')
 
-        state = load_state(self.config.datadir)
+        state = phil.util.load_state(self.config.datadir)
 
         if not self.quiet:
             out('Parsing ics file "%s"....' % self.config.icsfile)
@@ -60,8 +60,7 @@ class Phil(object):
                 if not self.quiet:
                     out('Sending reminder....')
                 summary = event.summary + ' (%s)' % format_date(next_date)
-                description = ('Next meeting: %s\n\n%s' %
-                               (format_date(next_date), event.description))
+                description = event.description % generate_date_bits(next_date)
 
                 if self.debug:
                     out('From:', self.config.sender)
@@ -70,9 +69,9 @@ class Phil(object):
                     out('Body:')
                     out(description, indent='    ', wrap=False)
                 else:
-                    send_mail_smtp(self.config.sender, self.config.to_list,
-                                   summary, description, self.config.host,
-                                   self.config.port)
+                    phil.util.send_mail_smtp(
+                        self.config.sender, self.config.to_list, summary,
+                        description, self.config.host, self.config.port)
 
                     state[event.event_id] = str(next_date.date())
             else:
@@ -81,7 +80,7 @@ class Phil(object):
                         (next_date.date() - datetime.timedelta(
                                 self.config.remind)))
 
-        save_state(self.config.datadir, state)
+        phil.util.save_state(self.config.datadir, state)
 
 
     def run(self, conffile):

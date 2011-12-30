@@ -39,6 +39,13 @@ def format_date(date):
     return date.strftime('%a %B %d, %Y %H:%M')
 
 
+def generate_date_bits(date):
+    return dict((m, date.strftime('%' + m))
+                for m in ('a', 'A', 'b', 'B', 'c', 'd', 'H', 'I', 'j',
+                          'm', 'M', 'p', 'S', 'U', 'v', 'W', 'x', 'X',
+                          'y', 'Y', 'Z'))
+
+
 def normalize_path(path, filetype=FILE):
     """Takes a path and a filetype, verifies existence and type, and
     returns absolute path.
