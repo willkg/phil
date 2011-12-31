@@ -174,6 +174,18 @@ FREQ_MAP = {
     }
 
 
+WEEKDAY_MAP = {
+    # TODO: Make sure this covers all of them.
+    'SU': dateutil.rrule.SU,
+    'MO': dateutil.rrule.MO,
+    'TU': dateutil.rrule.TU,
+    'WE': dateutil.rrule.WE,
+    'TH': dateutil.rrule.TH,
+    'FR': dateutil.rrule.FR,
+    'SA': dateutil.rrule.SA
+    }
+
+
 def get_next_date(dtstart, rrule):
     return rrule.after(dtstart, inc=True)
 
@@ -192,13 +204,20 @@ def convert_rrule(rrule):
 
     keys = ['wkst', 'until', 'bysetpos', 'interval',
             'bymonth', 'bymonthday', 'byyearday', 'byweekno',
-            'byweekday', 'byhour', 'byminute', 'bysecond']
+            'byhour', 'byminute', 'bysecond']
     def tweak(rrule, key):
         value = rrule.get(key)
         if isinstance(value, list):
             return value[0]
         return value
-    args = dict((key, tweak(rrule, key)) for key in keys)
+    args = dict((key, tweak(rrule, key)) for key in keys if rrule.get(key))
+
+    byweekday = rrule.get('byweekday')
+    if byweekday:
+        byweekday = byweekday[0]
+        count, day = int(byweekday[0]), byweekday[1:]
+        args['byweekday'] = WEEKDAY_MAP[day](count)
+
     return freq, args
 
 
