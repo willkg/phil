@@ -2,6 +2,16 @@
  CHANGELOG
 ===========
 
+phil 1.1 (December 30, 2011)
+============================
+
+* adds next6 subcommand
+* fixes messages so they're entirely from the event description
+* allows for date tokens in event description---these will be expanded
+  by the next_date.  anything in strftime is valid.  use python string
+  formatting.  e.g. ``%(Y)s`` for 4-digit year.
+
+
 phil 1.0.1 (December 12, 2011)
 ==============================
 

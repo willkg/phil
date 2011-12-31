@@ -34,6 +34,7 @@ Features
 * has a ``--quiet`` mode that will only print errors
 * correctly prints errors to stderr and output to stdout; also returns error
   code 1 if it failed
+* show the next 6 dates for an event with the ``next6`` command
 
 
 History
@@ -101,7 +102,7 @@ The config file is self-documenting.  Go through it to configure phil.
 Run
 ===
 
-For help, do this::
+For list of subcommands, arguments and other help, do this::
 
     phil-cmd --help
 
