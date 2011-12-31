@@ -71,12 +71,12 @@ the Terms and Conditions section of `LICENSE`_ for details.
 Install
 =======
 
-If you want a released version of phil, do this::
+If you want a released version of phil, do this:
 
 1. ``pip install phil``
 
 
-If you want a bleeding edge version of phil, do this::
+If you want a bleeding edge version of phil, do this:
 
 1. ``git clone git://github.com/willkg/phil.git``
 2. ``cd phil``
