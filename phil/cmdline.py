@@ -66,6 +66,16 @@ def run_cmd(parsed):
     return p.run(conffile)
 
 
+def next6_cmd(parsed):
+    conffile = os.path.abspath(parsed.runconffile)
+    if not os.path.exists(conffile):
+        phil.err('%s does not exist.' % conffile)
+        return 1
+
+    p = phil.Phil(parsed.quiet, parsed.debug)
+    return p.next6(conffile)
+
+
 def main(argv):
     if '-q' not in argv and '--quiet' not in argv:
         phil.out(BYLINE)
@@ -108,6 +118,13 @@ def main(argv):
         'runconffile',
         help='name/path for the configuration file')
     run_parser.set_defaults(func=run_cmd)
+
+    next6_parser = subparsers.add_parser(
+        'next6', help='tells you next 6 dates for an event')
+    next6_parser.add_argument(
+        'runconffile',
+        help='name/path for the configuration file')
+    next6_parser.set_defaults(func=next6_cmd)
 
     parsed = parser.parse_args(argv)
 
