@@ -2,6 +2,14 @@
  CHANGELOG
 ===========
 
+phil 1.2 (January 20, 2013)
+===========================
+
+* fixes weekday parsing
+* fixes some docs issues
+* fixes Trove package metadata regarding Python versions
+
+
 phil 1.1 (December 30, 2011)
 ============================
 

@@ -59,7 +59,7 @@ Thus phil was born.
 License, etc
 ============
 
-phil Copyright(C) 2011 Will Kahn-Greene
+phil Copyright(C) 2011, 2013 Will Kahn-Greene
 
 This program comes with ABSOLUTELY NO WARRANTY.  This is free software,
 and you are welcome to redistribute it under certain conditions.  See
@@ -71,16 +71,16 @@ the Terms and Conditions section of `LICENSE`_ for details.
 Install
 =======
 
-If you want a released version of phil, do this:
+If you want a released version of phil, do this::
 
-1. ``pip install phil``
+    $ pip install phil
 
 
-If you want a bleeding edge version of phil, do this:
+If you want a bleeding edge version of phil, do this::
 
-1. ``git clone git://github.com/willkg/phil.git``
-2. ``cd phil``
-3. ``python setup.py install``
+    $ git clone git://github.com/willkg/phil.git
+    $ cd phil
+    $ python setup.py install
 
 
 Configure

@@ -1,7 +1,7 @@
 #######################################################################
 # This file is part of phil.
 #
-# Copyright (C) 2011 Will Kahn-Greene
+# Copyright (C) 2011, 2012, 2013 Will Kahn-Greene
 #
 # phil is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,5 +17,5 @@
 # along with phil.  If not, see <http://www.gnu.org/licenses/>.
 #######################################################################
 
-__version__ = '1.1'
-__releasedate__ = '2011-12-30'
+__version__ = '1.2'
+__releasedate__ = '2013-01-20'
