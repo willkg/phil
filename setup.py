@@ -62,5 +62,7 @@ setup(
         "Operating System :: POSIX :: Linux",
         "Topic :: Communications :: Email",
         "Programming Language :: Python",
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         ],
     )
