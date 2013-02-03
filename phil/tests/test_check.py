@@ -35,8 +35,8 @@ class CheckTests(TempFileTestCase):
          .is_callable()
          .expects_call()
          .returns(
-                datetime.datetime(2011, 12, 29, 22, 35, 44, 600000)
-                )
+             datetime.datetime(2011, 12, 29, 22, 35, 44, 600000)
+             )
          )
 
         (fakeutil
@@ -45,12 +45,12 @@ class CheckTests(TempFileTestCase):
          .expects('save_state')
          .expects('send_mail_smtp')
          .with_args(
-                'sender@example.com', ['recip@example.com'],
-                u'bi-weekly conference call (Fri December 30, 2011 00:00)',
-                u'Weekly conference call\nLocation: IRC\nMeeting agenda '
-                'and notes: http://example.com/notes/2011-12-30\n\nBe '
-                'there or be square!',
-                'localhost', 25)
+             'sender@example.com', ['recip@example.com'],
+             u'bi-weekly conference call (Fri December 30, 2011 00:00)',
+             u'Weekly conference call\nLocation: IRC\nMeeting agenda '
+             'and notes: http://example.com/notes/2011-12-30\n\nBe '
+             'there or be square!',
+             'localhost', 25)
          )
 
         test2_path = os.path.join(get_test_data_dir(), 'test2.ics')

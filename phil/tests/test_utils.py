@@ -57,10 +57,10 @@ def test_parse_ics():
     eq_(len(events), 1)
 
     ev = events[0]
-    eq_(ev.event_id, u'2011-11-18 12:00:00::bi-weekly conference call::')
+    eq_(ev.event_id, u'2011-11-18 12:00:00+00:00::bi-weekly conference call::')
     eq_(ev.summary, u'bi-weekly conference call')
     eq_(ev.description, u'conference call')
-    
+
     # TODO: Test with other ics files
     # TODO: Test multiple events
 
@@ -76,6 +76,7 @@ def test_ics_description_expansion():
         u'Weekly conference call\nLocation: IRC\nMeeting agenda and notes: '
         'http://example.com/notes/%(Y)s-%(m)s-%(d)s\n\nBe there or be '
         'square!')
+
 
 def test_should_remind():
     def build_rrule(freq, **args):

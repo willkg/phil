@@ -30,7 +30,7 @@ except ImportError:
     sys.exit(1)
 
 
-BYLINE = ('phil-cmd: %s (%s).  Licensed under the GPLv3.' % (
+BYLINE = ('phil-cmd: {0} ({1}).  Licensed under the GPLv3.'.format(
         phil.__version__, phil.__releasedate__))
 USAGE = 'Usage: phil [program-options] COMMAND [command-options] ARGS'
 DESC = """
@@ -43,23 +43,23 @@ def createfile_cmd(parsed):
     path = os.path.abspath(outfile)
     conffile = phil.get_template()
     if os.path.exists(path):
-        phil.err('%s exists.  Remove it and try again or try again with '
-                 'a different filename.' % outfile)
+        phil.err('{0} exists.  Remove it and try again or try again with '
+                 'a different filename.'.format(outfile))
         return 1
 
     f = open(path, 'w')
     f.write(conffile)
     f.close()
 
-    phil.out(
-        '%s written.  Open it in your favorite editor and read it.' % outfile)
+    phil.out('{0} written.  Open it in your favorite editor and read it.'
+        .format(outfile))
     return 0
 
 
 def run_cmd(parsed):
     conffile = os.path.abspath(parsed.runconffile)
     if not os.path.exists(conffile):
-        phil.err('%s does not exist.' % conffile)
+        phil.err('{0} does not exist.'.format(conffile))
         return 1
 
     p = phil.Phil(parsed.quiet, parsed.debug)
@@ -69,7 +69,7 @@ def run_cmd(parsed):
 def next6_cmd(parsed):
     conffile = os.path.abspath(parsed.runconffile)
     if not os.path.exists(conffile):
-        phil.err('%s does not exist.' % conffile)
+        phil.err('{0} does not exist.'.format(conffile))
         return 1
 
     p = phil.Phil(parsed.quiet, parsed.debug)

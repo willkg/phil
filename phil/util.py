@@ -23,7 +23,7 @@ import textwrap
 import sys
 import json
 import ConfigParser
-from icalendar import Calendar, vDatetime, vText
+from icalendar import Calendar, vDatetime, vDDDTypes, vText
 import dateutil.rrule
 from collections import namedtuple
 import smtplib
@@ -52,13 +52,13 @@ def normalize_path(path, filetype=FILE):
 
     """
     if not path:
-        raise ValueError('"%s" is not a valid path.' % path)
+        raise ValueError('"{0}" is not a valid path.'.format(path))
     if not os.path.exists(path):
-        raise ValueError('"%s" does not exist.' % path)
+        raise ValueError('"{0}" does not exist.'.format(path))
     if filetype == FILE and not os.path.isfile(path):
-        raise ValueError('"%s" is not a file.' % path)
+        raise ValueError('"{0}" is not a file.'.format(path))
     elif filetype == DIR and not os.path.isdir(path):
-        raise ValueError('"%s" is not a dir.' % path)
+        raise ValueError('"{0}" is not a dir.'.format(path))
 
     return os.path.abspath(path)
 
@@ -82,7 +82,7 @@ def err(*output, **kwargs):
 
     """
     output = 'Error: ' + ' '.join([str(o) for o in output])
-    if kwargs.get('wrap') != False:
+    if kwargs.get('wrap') is not False:
         output = '\n'.join(wrap(output, kwargs.get('indent', '')))
     elif kwargs.get('indent'):
         indent = kwargs['indent']
@@ -98,7 +98,7 @@ def out(*output, **kwargs):
 
     """
     output = ' '.join([str(o) for o in output])
-    if kwargs.get('wrap') != False:
+    if kwargs.get('wrap') is not False:
         output = '\n'.join(wrap(output, kwargs.get('indent', '')))
     elif kwargs.get('indent'):
         indent = kwargs['indent']
@@ -205,11 +205,13 @@ def convert_rrule(rrule):
     keys = ['wkst', 'until', 'bysetpos', 'interval',
             'bymonth', 'bymonthday', 'byyearday', 'byweekno',
             'byhour', 'byminute', 'bysecond']
+
     def tweak(rrule, key):
         value = rrule.get(key)
         if isinstance(value, list):
             return value[0]
         return value
+
     args = dict((key, tweak(rrule, key)) for key in keys if rrule.get(key))
 
     byweekday = rrule.get('byweekday')
@@ -225,9 +227,9 @@ def parse_ics(icsfile):
     """Takes an icsfilename, parses it, and returns Events."""
     events = []
 
-    cal = Calendar.from_string(open(icsfile, 'rb').read())
+    cal = Calendar.from_ical(open(icsfile, 'rb').read())
     for component in cal.walk('vevent'):
-        dtstart = vDatetime.from_ical(str(component['dtstart']))
+        dtstart = component['dtstart'].dt
         rrule = component['rrule']
 
         freq, args = convert_rrule(rrule)

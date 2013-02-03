@@ -18,13 +18,13 @@
 #######################################################################
 
 
-import datetime
 import ConfigParser
+import datetime
 
+import phil.util
 from phil.util import (
     out, err, parse_configuration, parse_ics, get_next_date, should_remind,
     format_date, generate_date_bits)
-import phil.util
 
 
 class Phil(object):
@@ -42,12 +42,12 @@ class Phil(object):
         state = phil.util.load_state(self.config.datadir)
 
         if not self.quiet:
-            out('Parsing ics file "%s"....' % self.config.icsfile)
+            out('Parsing ics file "{0}"....'.format(self.config.icsfile))
 
         events = parse_ics(self.config.icsfile)
         for event in events:
             if not self.quiet:
-                out('Looking at event "%s"....' % event.summary)
+                out('Looking at event "{0}"....'.format(event.summary))
 
             next_date = get_next_date(dtstart, event.rrule)
             previous_remind = state.get(event.event_id)
@@ -59,7 +59,8 @@ class Phil(object):
             if should_remind(dtstart, next_date, self.config.remind):
                 if not self.quiet:
                     out('Sending reminder....')
-                summary = event.summary + ' (%s)' % format_date(next_date)
+                summary = '{0} ({1})'.format(
+                    event.summary, format_date(next_date))
                 description = event.description % generate_date_bits(next_date)
 
                 if self.debug:
@@ -74,11 +75,9 @@ class Phil(object):
                         description, self.config.host, self.config.port)
 
                     state[event.event_id] = str(next_date.date())
-            else:
-                if not self.quiet:
-                    out('Next reminder should get sent on %s.' %
-                        (next_date.date() - datetime.timedelta(
-                                self.config.remind)))
+            elif not self.quiet:
+                out('Next reminder should get sent on {0}.'.format(
+                    next_date.date() - datetime.timedelta(self.config.remind)))
 
         phil.util.save_state(self.config.datadir, state)
 
@@ -88,7 +87,7 @@ class Phil(object):
         try:
             self.config = parse_configuration(conffile)
         except ConfigParser.NoOptionError, noe:
-            err('Missing option in config file: %s' % noe)
+            err('Missing option in config file: {0}'.format(noe))
             return 1
 
         try:
@@ -113,21 +112,23 @@ class Phil(object):
 
         state = phil.util.load_state(self.config.datadir)
 
-        out('Parsing ics file "%s"....' % self.config.icsfile)
+        out('Parsing ics file "{0}"....'.format(self.config.icsfile))
 
         events = parse_ics(self.config.icsfile)
         for event in events:
-            out('Looking at event "%s"....' % event.summary)
+            out('Looking at event "{0}"....'.format(event.summary))
             next_date = dtstart
 
             for i in range(6):
                 next_date = get_next_date(next_date, event.rrule)
                 previous_remind = state.get(event.event_id)
-                if previous_remind and previous_remind == str(next_date.date()):
-                    out('* %s (sent reminder already)' % next_date.strftime('%c'))
+                if (previous_remind
+                        and previous_remind == str(next_date.date())):
+                    out('* {0} (sent reminder already)'.format(
+                        next_date.strftime('%c')))
 
                 else:
-                    out('* %s' % next_date.strftime('%c'))
+                    out('* {0}'.format(next_date.strftime('%c')))
 
                 next_date = next_date + datetime.timedelta(1)
 
@@ -137,7 +138,7 @@ class Phil(object):
         try:
             self.config = parse_configuration(conffile)
         except ConfigParser.NoOptionError, noe:
-            err('Missing option in config file: %s' % noe)
+            err('Missing option in config file: {0}'.format(noe))
             return 1
 
         try:
