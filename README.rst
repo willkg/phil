@@ -2,6 +2,19 @@
  phil
 ======
 
+:source code:   https://github.com/willkg/phil
+:issue tracker: https://github.com/willkg/phil/issues
+:license:       GPLv3
+
+
+Status - February 9th, 2013
+===========================
+
+This project is not under active development. If you have changes,
+please submit a pull request (preferably with tests) and I'll merge
+it in.
+
+
 Summary
 =======
 
@@ -59,7 +72,7 @@ Thus phil was born.
 License, etc
 ============
 
-phil Copyright(C) 2011, 2013 Will Kahn-Greene
+phil Copyright(C) 2011, 2012, 2013 Will Kahn-Greene
 
 This program comes with ABSOLUTELY NO WARRANTY.  This is free software,
 and you are welcome to redistribute it under certain conditions.  See
@@ -154,22 +167,6 @@ With nose-progressive and fail-fast::
 .. _nose-progressive: http://pypi.python.org/pypi/nose-progressive/
 .. _nose: http://code.google.com/p/python-nose/
 .. _fudge: http://farmdev.com/projects/fudge/
-
-
-Source code
-===========
-
-Source code is hosted on github.
-
-https://github.com/willkg/phil
-
-
-Issue tracker
-=============
-
-Issue tracker is hosted on github.
-
-https://github.com/willkg/phil/issues
 
 
 Resources I found helpful
