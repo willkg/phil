@@ -2,9 +2,9 @@
  phil
 ======
 
-:source code:   https://github.com/willkg/phil
-:issue tracker: https://github.com/willkg/phil/issues
-:license:       GPLv3
+:Code:          https://github.com/willkg/phil
+:Issue tracker: https://github.com/willkg/phil/issues
+:License:       GPLv3
 
 
 Status - February 9th, 2013
